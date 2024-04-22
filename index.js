@@ -1,3 +1,7 @@
+(function () {
+  console.log('The system was started.');
+})();
+
 function __isValidName(name) {
   if (typeof name !== 'string') {
     console.log('Name must be a string!');
@@ -5,9 +9,13 @@ function __isValidName(name) {
   }
   return true;
 }
+
+function __isValid(value) {
+  return value >= 0 && value <= 100;
+}
 // <-- Object Device -->
 function Device(name) {
-  if (!__isValidName()) {
+  if (!__isValidName(name)) {
     return;
   }
   this._name = name;
@@ -15,6 +23,20 @@ function Device(name) {
 }
 
 // <-- Device functions -->
+Device.prototype.name = function (name) {
+  if (name !== undefined) {
+    if (!__isValidName(name)) {
+      return;
+    }
+    var prevName = this._name;
+    this._name = name;
+    console.log(
+      'The name "' + prevName + '" has been changed to "' + name + '".'
+    );
+  } else {
+    return this._name;
+  }
+};
 Device.prototype.on = function () {
   this._powerOn = true;
   console.log('Device with name "' + this._name + '" is now on.');
@@ -26,13 +48,10 @@ Device.prototype.off = function () {
 Device.prototype.powerIsOn = function () {
   return this._powerOn;
 };
-function __isValid(value) {
-  return value >= 0 && value <= 100;
-}
 
 // <-- Object Lamp -->
 function Lamp(name) {
-  if (!__isValidName()) {
+  if (!__isValidName(name)) {
     return;
   }
   Device.call(this, name);
@@ -56,7 +75,7 @@ Lamp.prototype.bright = function (bright) {
 
 // <-- Object Conditioner -->
 function Conditioner(name) {
-  if (!__isValidName()) {
+  if (!__isValidName(name)) {
     return;
   }
   Device.call(this, name);
@@ -80,7 +99,7 @@ Conditioner.prototype.temperature = function (temperature) {
 
 // <-- Object TV -->
 function TV(name) {
-  if (!__isValidName()) {
+  if (!__isValidName(name)) {
     return;
   }
   Device.call(this, name);
@@ -128,11 +147,12 @@ __ControlSystem.prototype.displayControlSystems = function () {
     var status = alarmSystem.__isOn ? 'enabled' : 'disabled';
     alarmSystemInfo.push(alarmSystem.__name + ' - ' + status);
   }
-  for (var j = 0; j < alarmSystemInfo.length; j++) {
-    console.log(alarmSystemInfo[j]);
-  }
   if (alarmSystemInfo.length === 0) {
     console.log('No alarm systems.');
+    return;
+  }
+  for (var j = 0; j < alarmSystemInfo.length; j++) {
+    console.log(alarmSystemInfo[j]);
   }
 };
 
@@ -141,11 +161,11 @@ __ControlSystem.prototype.addAlarmSystem = function (name) {
   var alarmSystem = new __AlarmSystem(name, this);
   this.__controlDevices.push(alarmSystem);
   console.log(
-    "Alarm System with name: '" +
+    'Alarm System "' +
       alarmSystem.__name +
-      "' was added in your control system: '" +
+      '" was added in your control system: "' +
       this.__name +
-      "'."
+      '".'
   );
   return alarmSystem;
 };
@@ -239,10 +259,17 @@ function SmartHouse(name) {
 
 // <-- SmartHouse functions -->
 SmartHouse.prototype.name = function (name) {
-  if (name === undefined) {
-    return this.__name;
-  } else {
+  if (name !== undefined) {
+    if (!__isValidName(name)) {
+      return;
+    }
+    var prevName = this.__name;
     this.__name = name;
+    console.log(
+      'The name "' + prevName + '" has been changed to "' + name + '".'
+    );
+  } else {
+    return this.__name;
   }
 };
 SmartHouse.prototype.openHouse = function () {
@@ -391,10 +418,11 @@ SmartHouse.prototype.displayInfoAboutHouse = function () {
   setTimeout(displayHouseInfo, 2000);
 };
 
+// <-- implementation of everything -->
 var sh = new SmartHouse('house1');
 
 sh.addControlSystem('Control1');
-sh.addDevice(new Lamp());
+sh.addDevice(new Lamp('Lamp1'));
 sh.getControlSystemByName('Control1').addAlarmSystem('Alarm1');
 sh.getControlSystemByName('Control1').displayControlSystems();
 // sh.addDevice(new Lamp('Lamp2'));
